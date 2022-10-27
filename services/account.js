@@ -46,15 +46,15 @@ const deleteRecord = (req, res) => {
 }
 
 // thêm mới
-const insertRecord = (req, res) => {
+const insertRecord = async(req, res) => {
     try {
-        validateData(req.body);
+        await validateInsert(req.body);
         if (!isValid) {
             res.status(400).json(listErrors)
         } else {
             var values = Object.values(req.body);
             let procedure = `CALL proc_insertAccount(?,?,?,?,?,?,?)`;
-            connect.query(procedure, values, function(err, data) {
+            await connect.query(procedure, values, function(err, data) {
                 if (err)
                     res.status(400).json(err)
                 res.status(201).json(1)
@@ -82,25 +82,19 @@ const updateRecord = (req, res) => {
     }
 }
 
-function checkDuplicateEmail(email) {
+async function checkDuplicateEmail(email) {
     isDuplicate = false;
-    try {
-        var sql = `select * from account where email = "` + email + `"`;
-        connect.query(sql, function(err, data) {
-            if (data.length != 0) {
-                console.log("có trùng");
-                isDuplicate = true;
-                console.log("Đã thay đổi", isDuplicate);
-            } else {
-                console.log("không trùng");
-            }
-        });
-    } catch (error) {
-        console.log(error);
-    }
+    var sql = `select * from account where email = "` + email + `"`;
+    await connect.promise().
+    query(sql).
+    then(([rows, fields]) => {
+        if (rows.length != 0) {
+            isDuplicate = true;
+        }
+    }).catch().then()
 }
 
-async function validateData(data) {
+function validateData(data) {
     if (!data.FirstName) {
         isValid = false;
         listErrors.push("Tên người dùng không được để trống");
@@ -126,15 +120,25 @@ async function validateData(data) {
         isValid = false;
         listErrors.push("Địa chỉ không được để trống");
     }
-    checkDuplicateEmail(data.Email)
-    console.log("Trong hàm check", isDuplicate);
-    if (isDuplicate == true) {
+}
+
+// async function IsDuplicate(data) {
+//     console.log(data);
+//     await checkDuplicateEmail(data);
+//     if (isDuplicate) {
+//         isValid = false;
+//         listErrors.push("Email đã tồn tại");
+//     }
+// }
+
+async function validateInsert(data) {
+    validateData(data);
+    await checkDuplicateEmail(data.Email);
+    if (isDuplicate) {
         isValid = false;
         listErrors.push("Email đã tồn tại");
     }
 }
-
-
 
 module.exports = {
     getAllData,
