@@ -68,15 +68,22 @@ const insertRecord = async(req, res) => {
 }
 
 // cập nhật
-const updateRecord = (req, res) => {
+const updateRecord = async(req, res) => {
     try {
-        var values = Object.values(req.body);
-        let procedure = `CALL proc_updateAccount(?,?,?,?,?,?,?)`;
-        connect.query(procedure, values, function(err, data) {
-            if (err)
-                res.status(400).json(err)
-            res.status(200).json(1)
-        });
+        await validateData(req.body);
+        if (!isValid) {
+            res.status(400).json(listErrors);
+        } else {
+            var values = Object.values(req.body);
+            let procedure = `CALL proc_updateAccount(?,?,?,?,?,?,?)`;
+            connect.query(procedure, values, function(err, data) {
+                if (err)
+                    res.status(400).json(err)
+                res.status(200).json(1)
+            });
+        }
+        listErrors = [];
+        isValid = true;
     } catch (error) {
         console.log(error);
     }
@@ -121,15 +128,6 @@ function validateData(data) {
         listErrors.push("Địa chỉ không được để trống");
     }
 }
-
-// async function IsDuplicate(data) {
-//     console.log(data);
-//     await checkDuplicateEmail(data);
-//     if (isDuplicate) {
-//         isValid = false;
-//         listErrors.push("Email đã tồn tại");
-//     }
-// }
 
 async function validateInsert(data) {
     validateData(data);
