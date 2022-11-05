@@ -16,6 +16,33 @@ const getAllData = (req, res) => {
     }
 }
 
+// phân trang
+const getDataPaging = async(req, res) => {
+    try {
+        let paging = require('url').parse(req.url, true).query;
+        let values = Object.values(paging);
+        // lấy sản phẩm
+        const result = {};
+        let procedure = `CALL Proc_pagingProduct(?, ?, ?)`;
+        connect.query(procedure, values, function(err, data) {
+            if (err)
+                res.status(400).json(err)
+            result.data = data[0];
+            // lấy tổng số bản ghi
+            let procGetTotalRecord = `CALL Proc_getTotalRecordProduct`;
+            connect.query(procGetTotalRecord, function(err, data) {
+                if (err)
+                    res.status(400).json(err);
+                var totalRecord = data[0];
+                result.totalRecord = totalRecord[0].ToTal;
+                res.status(200).json(result);
+            });
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 // lấy theo ID
 const getByID = (req, res) => {
     try {
@@ -120,5 +147,6 @@ module.exports = {
     getByID,
     deleteProduct,
     insertProduct,
-    updateProduct
+    updateProduct,
+    getDataPaging
 }

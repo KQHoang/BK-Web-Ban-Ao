@@ -28,23 +28,20 @@ const getDataPaging = async(req, res) => {
         // lấy tài khoản
         const result = {};
         let procedure = `CALL Proc_pagingAccount(?, ?, ?)`;
-        await connect.query(procedure, values, function(err, data) {
+        connect.query(procedure, values, function(err, data) {
             if (err)
                 res.status(400).json(err)
-                // console.log("1");
-                // result.data = data[0];
-            res.status(201).json(data[0])
+            result.data = data[0];
+            // lấy tổng số bản ghi
+            let procGetTotalRecord = `CALL Proc_getTotalRecordAccount`;
+            connect.query(procGetTotalRecord, function(err, data) {
+                if (err)
+                    res.status(400).json(err);
+                var totalRecord = data[0];
+                result.totalRecord = totalRecord[0].ToTal;
+                res.status(200).json(result);
+            });
         });
-
-        // lấy tổng số bản ghi
-        // let procGetTotalRecord = `CALL Proc_getTotalRecordAccount`;
-        // connect.query(procGetTotalRecord, function(err, data) {
-        //     if (err)
-        //         res.status(400).json(err);
-        //     console.log("2");
-        //     result.totalRecord = data;
-        // });
-        // res.status(200).json(result);
     } catch (error) {
         console.log(error);
     }

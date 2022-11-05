@@ -7,6 +7,9 @@ router.route('/products')
     .post(product.insertProduct)
     .put(product.updateProduct)
 
+router.route('/products/paging')
+    .get(product.getDataPaging)
+
 router.route('/products/:id')
     .get(product.getByID)
     .delete(product.deleteProduct)
