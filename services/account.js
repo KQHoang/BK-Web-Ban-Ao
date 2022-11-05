@@ -33,8 +33,8 @@ const getDataPaging = async(req, res) => {
                 res.status(400).json(err)
                 // console.log("1");
                 // result.data = data[0];
+            res.status(201).json(data[0])
         });
-        res.status(201).json(data[0])
 
         // lấy tổng số bản ghi
         // let procGetTotalRecord = `CALL Proc_getTotalRecordAccount`;
