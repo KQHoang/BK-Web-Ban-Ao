@@ -1,5 +1,8 @@
+const { query } = require("express");
 var connection = require("../connection/connect.js")
 var connect = connection.connection
+const queryString = require('query-string')
+
 let isValid = true;
 let isDuplicate
 let listErrors = [];
@@ -12,6 +15,36 @@ const getAllData = (req, res) => {
                 res.status(400).json(err)
             res.status(200).json(data)
         });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// phân trang
+const getDataPaging = async(req, res) => {
+    try {
+        let paging = require('url').parse(req.url, true).query;
+        let values = Object.values(paging);
+        // lấy tài khoản
+        const result = {};
+        let procedure = `CALL Proc_pagingAccount(?, ?, ?)`;
+        await connect.query(procedure, values, function(err, data) {
+            if (err)
+                res.status(400).json(err)
+                // console.log("1");
+                // result.data = data[0];
+        });
+        res.status(201).json(data[0])
+
+        // lấy tổng số bản ghi
+        // let procGetTotalRecord = `CALL Proc_getTotalRecordAccount`;
+        // connect.query(procGetTotalRecord, function(err, data) {
+        //     if (err)
+        //         res.status(400).json(err);
+        //     console.log("2");
+        //     result.totalRecord = data;
+        // });
+        // res.status(200).json(result);
     } catch (error) {
         console.log(error);
     }
@@ -143,5 +176,6 @@ module.exports = {
     getByID,
     deleteRecord,
     insertRecord,
-    updateRecord
+    updateRecord,
+    getDataPaging
 }

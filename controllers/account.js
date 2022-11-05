@@ -7,6 +7,9 @@ router.route('/accounts')
     .post(account.insertRecord)
     .put(account.updateRecord)
 
+router.route('/accounts/paging')
+    .get(account.getDataPaging)
+
 router.route('/accounts/:id')
     .get(account.getByID)
     .delete(account.deleteRecord)
