@@ -80,7 +80,7 @@ const insertProduct = (req, res) => {
             res.status(400).json(listErrors)
         } else {
             var values = Object.values(req.body);
-            let procedure = `CALL proc_insertProduct(?,?,?,?,?,?,?,?)`;
+            let procedure = `CALL proc_insertProduct(?,?,?,?,?,?,?)`;
             connect.query(procedure, values, function(err, data) {
                 if (err)
                     res.status(400).json(err)
