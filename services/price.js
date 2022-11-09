@@ -16,10 +16,10 @@ const getAllData = (req, res) => {
     }
 }
 
-// lấy theo ID
+// lấy theo ID sản phẩm
 const getByID = (req, res) => {
     try {
-        var sql = `select * from price where priceID = ${req.params.id}`;
+        var sql = `select * from price where ProductID = ${req.params.id}`;
         connect.query(sql, function(err, data) {
             if (err)
                 res.status(400).json(err)
